@@ -10,38 +10,70 @@
 #define BLOCKS_THREAD  32
 #define SOURCE 6 
 
-__global__ void parallelDjikstra(int* adj_matrix, int minInd, bool* included, int* dist) {
+__global__ void parallelDjikstra(int* minInd, bool* included, int* dist, int* adj_matrix) {
     for (int idx = threadIdx.x + blockIdx.x * blockDim.x; idx < VERTICES; idx += blockDim.x * gridDim.x) {
-        if (!included[idx] && adj_matrix[minInd * VERTICES + idx] != -1 && dist[minInd] + adj_matrix[minInd * VERTICES + idx] < dist[idx] && dist[minInd] != INT_MAX) {
-            dist[idx] = dist[minInd] + adj_matrix[minInd * VERTICES + idx];
+        if (!included[idx] && adj_matrix[*minInd * VERTICES + idx] != -1 && dist[*minInd] 
+            + adj_matrix[*minInd * VERTICES + idx] < dist[idx] && dist[*minInd] != INT_MAX) {
+            dist[idx] = dist[*minInd] + adj_matrix[*minInd * VERTICES + idx];
         }
     }
+}
+
+__global__ void minDist(int* minInd, bool* included, int* dist, int* min) {
+    for (int d = 0; d < VERTICES; d++) {
+        if (included[d] == false && dist[d] <= *min) {
+            *min = dist[d];
+            *minInd = d;
+        }
+    }
+    included[*minInd] = true;
 }
 
 int main()
 {
     // DECLARE VARIABLES 
     cudaError_t cudaStatus = cudaSuccess;
-    int* adj_matrix = NULL; // graph
-    int* dist = NULL;       // holds the distance from source vertext to all others
-    bool* included = NULL;  // vertexes that are locked in or not
+    int* adj_matrix = (int*)malloc(VERTICES * VERTICES * sizeof(int)); // graph
+    int* dist = (int*)malloc(VERTICES * sizeof(int));                  // holds the distance from source vertext to all others
+    bool* included = (bool*)malloc(VERTICES * sizeof(bool));           // vertexes that are locked in or not
+    int* min = (int*)malloc(sizeof(int));
+    int* minInd = (int*)malloc(sizeof(int));
 
-    // ALLOCATE UNIFIED MEMORY
-    cudaStatus = cudaMallocManaged(&adj_matrix, VERTICES * VERTICES * sizeof(int));
+    // device variables
+    int* d_adj_matrix = NULL;
+    int* d_dist = NULL;
+    bool* d_included = NULL;
+    int* d_min = NULL;
+    int* d_minInd = NULL;
+
+    // ALLOCATE EXPLICIT MEMORY
+    cudaStatus = cudaMalloc(&d_adj_matrix, VERTICES * VERTICES * sizeof(int));
     if (cudaStatus != cudaSuccess) {
-        fprintf(stderr, "cudaMallocManaged1 failed!: %s\n", cudaGetErrorString(cudaStatus));
+        fprintf(stderr, "cudaMalloc failed!: %s\n", cudaGetErrorString(cudaStatus));
         goto Error;
     }
 
-    cudaStatus = cudaMallocManaged(&dist, VERTICES * sizeof(int));
+    cudaStatus = cudaMalloc(&d_dist, VERTICES * sizeof(int));
     if (cudaStatus != cudaSuccess) {
-        fprintf(stderr, "cudaMallocManaged2 failed!: %s\n", cudaGetErrorString(cudaStatus));
+        fprintf(stderr, "cudaMalloc failed!: %s\n", cudaGetErrorString(cudaStatus));
         goto Error;
     }
 
-    cudaStatus = cudaMallocManaged(&included, VERTICES * sizeof(bool));
+    cudaStatus = cudaMalloc(&d_included, VERTICES * sizeof(bool));
     if (cudaStatus != cudaSuccess) {
-        fprintf(stderr, "cudaMallocManaged3 failed!: %s\n", cudaGetErrorString(cudaStatus));
+        fprintf(stderr, "cudaMalloc failed!: %s\n", cudaGetErrorString(cudaStatus));
+        goto Error;
+    }
+
+    cudaStatus = cudaMalloc(&d_min, sizeof(int));
+    if (cudaStatus != cudaSuccess) {
+        fprintf(stderr, "cudaMalloc failed!: %s\n", cudaGetErrorString(cudaStatus));
+        goto Error;
+    }
+
+    cudaStatus = cudaMalloc(&d_minInd, sizeof(bool));
+    if (cudaStatus != cudaSuccess) {
+        fprintf(stderr, "cudaMalloc failed!: %s\n", cudaGetErrorString(cudaStatus));
         goto Error;
     }
 
@@ -76,47 +108,71 @@ int main()
     }
 
     dist[source] = 0; //distance to itself is 0
-    int min = INT_MAX;
-    int minInd;
+    *min = INT_MAX;
+
+    cudaStatus = cudaMemcpy(d_adj_matrix, adj_matrix, VERTICES * VERTICES * sizeof(int), cudaMemcpyHostToDevice);
+    if (cudaStatus != cudaSuccess) {
+        fprintf(stderr, "cudaMemcpy failed!: %s\n", cudaGetErrorString(cudaStatus));
+        goto Error;
+    }
+
+    cudaStatus = cudaMemcpy(d_included, included, VERTICES * sizeof(bool), cudaMemcpyHostToDevice);
+    if (cudaStatus != cudaSuccess) {
+        fprintf(stderr, "cudaMemcpy failed!: %s\n", cudaGetErrorString(cudaStatus));
+        goto Error;
+    }
+
+    cudaStatus = cudaMemcpy(d_dist, dist, VERTICES * sizeof(int), cudaMemcpyHostToDevice);
+    if (cudaStatus != cudaSuccess) {
+        fprintf(stderr, "cudaMemcpy failed!: %s\n", cudaGetErrorString(cudaStatus));
+        goto Error;
+    }
+
+    cudaStatus = cudaMemcpy(d_min, min, sizeof(int), cudaMemcpyHostToDevice);
+    if (cudaStatus != cudaSuccess) {
+        fprintf(stderr, "cudaMemcpy failed!: %s\n", cudaGetErrorString(cudaStatus));
+        goto Error;
+    }
 
     // START RUNTIME MEASUREMENT
     printf("Timer starts\n");
     auto start = std::chrono::high_resolution_clock::now();
 
     for (int c = 0; c < VERTICES - 1; c++) {
-        for (int d = 0; d < VERTICES; d++) {
-            if (included[d] == false && dist[d] <= min) {
-                min = dist[d];
-                minInd = d;
-            }
-        }
-
-        included[minInd] = true;
-        parallelDjikstra << < BLOCKS_THREAD, NUM_OF_THREADS >> > (adj_matrix, minInd, included, dist);
-
-        // Check for any errors launching the kernel
-        cudaStatus = cudaGetLastError();
-        if (cudaStatus != cudaSuccess) {
-            fprintf(stderr, "parallelDjikstra launch failed: %s\n", cudaGetErrorString(cudaStatus));
-            goto Error;
-        }
-
-        // cudaDeviceSynchronize waits for the kernel to finish, and returns
-        // any errors encountered during the launch.
-        cudaStatus = cudaDeviceSynchronize();
-        if (cudaStatus != cudaSuccess) {
-            fprintf(stderr, "cudaDeviceSynchronize returned error code %d after launching parallelDjikstra!\n", cudaStatus);
-            goto Error;
-        }
+        minDist << < 1, 1 >> > (d_minInd, d_included, d_dist, d_min);
+        parallelDjikstra << < BLOCKS_THREAD, NUM_OF_THREADS >> > (d_minInd, d_included, d_dist, d_adj_matrix);
     }
 
     // END RUNTIME MEASUREMENT
     auto end = std::chrono::high_resolution_clock::now();
     auto elapsed = std::chrono::duration_cast<std::chrono::nanoseconds>(end - start).count();
     printf("Timer ends\n");
-    printf("The parallel Dijkstra's SSSP algorithm took %f seconds to execute graph with %d vertices using %d threads and %d blocks", elapsed / 1000000000.0, VERTICES, NUM_OF_THREADS, BLOCKS_THREAD);
-    
-    //Print distance of source to every vertex
+    printf("The parallel Dijkstra's SSSP algorithm took %f seconds to execute graph with %d vertices using %d threads and %d blocks\n", elapsed / 1000000000.0, VERTICES, NUM_OF_THREADS, BLOCKS_THREAD);
+
+    // Copy dist back to host to print
+    cudaStatus = cudaMemcpy(dist, d_dist, VERTICES * sizeof(int), cudaMemcpyDeviceToHost);
+    if (cudaStatus != cudaSuccess) {
+        fprintf(stderr, "cudaMemcpy failed!: %s\n", cudaGetErrorString(cudaStatus));
+        goto Error;
+    }
+
+    /*
+    // Test
+    // copy graph back to host for testing
+    cudaStatus = cudaMemcpy(adj_matrix, d_adj_matrix, VERTICES * VERTICES * sizeof(int), cudaMemcpyDeviceToHost);
+    if (cudaStatus != cudaSuccess) {
+        fprintf(stderr, "cudaMemcpy failed!: %s\n", cudaGetErrorString(cudaStatus));
+        goto Error;
+    }
+
+    for (int i = 0; i < VERTICES; i++)
+        for (int j = 0; j < VERTICES; j++)
+            printf("adj_matrix[%d][%d]: %d\n", i, j, adj_matrix[i * VERTICES + j]);
+
+    for (int i = 0; i < VERTICES; i++)
+        printf("dist[%d]: %d\n", i, dist[i]);*/
+
+    // Print distance of source to every vertex
     for (int f = 0; f < VERTICES; f++) {
         if (dist[f] == INT_MAX) {
             dist[f] = -1;
@@ -134,9 +190,16 @@ int main()
 
 Error:
     //Cleanup
-    cudaFree(adj_matrix);
-    cudaFree(dist);
-    cudaFree(included);
+    cudaFree(d_adj_matrix);
+    cudaFree(d_dist);
+    cudaFree(d_included);
+    cudaFree(d_min);
+    cudaFree(d_minInd);
+    free(adj_matrix);
+    free(dist);
+    free(included);
+    free(min);
+    free(minInd);
 
     return cudaStatus;
 }
