@@ -11,7 +11,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectGuid>{53ED4291-E5AF-40A4-B903-24291BA0D4E5}</ProjectGuid>
+    <ProjectGuid>{9E2CAC48-3714-4F94-BFFB-285537FF6704}</ProjectGuid>
     <RootNamespace>sequentialDijkstras</RootNamespace>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
@@ -77,8 +77,7 @@
     </CudaCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <CudaCompile Include="kernel.cu" />
-    <CudaCompile Include="sequentialDijkstas.cu" />
+    <CudaCompile Include="sequentialDijkstras.cu" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

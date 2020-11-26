@@ -1,9 +1,11 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
-VisualStudioVersion = 16.0.30523.141
+VisualStudioVersion = 16.0.30413.136
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "sequentialDijkstras", "sequentialDijkstras\sequentialDijkstras.vcxproj", "{53ED4291-E5AF-40A4-B903-24291BA0D4E5}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "sequentialDijkstras", "sequentialDijkstras\sequentialDijkstras.vcxproj", "{9E2CAC48-3714-4F94-BFFB-285537FF6704}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "parallelDijkstras", "parallelDijkstras\parallelDijkstras.vcxproj", "{40186EFF-5FD3-41B8-8B39-28D95636AC07}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -11,15 +13,19 @@ Global
 		Release|x64 = Release|x64
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{53ED4291-E5AF-40A4-B903-24291BA0D4E5}.Debug|x64.ActiveCfg = Debug|x64
-		{53ED4291-E5AF-40A4-B903-24291BA0D4E5}.Debug|x64.Build.0 = Debug|x64
-		{53ED4291-E5AF-40A4-B903-24291BA0D4E5}.Release|x64.ActiveCfg = Release|x64
-		{53ED4291-E5AF-40A4-B903-24291BA0D4E5}.Release|x64.Build.0 = Release|x64
+		{9E2CAC48-3714-4F94-BFFB-285537FF6704}.Debug|x64.ActiveCfg = Debug|x64
+		{9E2CAC48-3714-4F94-BFFB-285537FF6704}.Debug|x64.Build.0 = Debug|x64
+		{9E2CAC48-3714-4F94-BFFB-285537FF6704}.Release|x64.ActiveCfg = Release|x64
+		{9E2CAC48-3714-4F94-BFFB-285537FF6704}.Release|x64.Build.0 = Release|x64
+		{40186EFF-5FD3-41B8-8B39-28D95636AC07}.Debug|x64.ActiveCfg = Debug|x64
+		{40186EFF-5FD3-41B8-8B39-28D95636AC07}.Debug|x64.Build.0 = Debug|x64
+		{40186EFF-5FD3-41B8-8B39-28D95636AC07}.Release|x64.ActiveCfg = Release|x64
+		{40186EFF-5FD3-41B8-8B39-28D95636AC07}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
-		SolutionGuid = {9F839163-E83F-4807-BD70-C8856960C052}
+		SolutionGuid = {2951F8DE-BD65-4F05-B142-891FBF1D47A3}
 	EndGlobalSection
 EndGlobal
