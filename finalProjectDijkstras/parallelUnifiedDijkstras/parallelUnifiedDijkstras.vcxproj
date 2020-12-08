@@ -11,8 +11,8 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectGuid>{9E2CAC48-3714-4F94-BFFB-285537FF6704}</ProjectGuid>
-    <RootNamespace>sequentialDijkstras</RootNamespace>
+    <ProjectGuid>{4573FEA6-7C56-4A6E-A9E8-30FB0BBCD53B}</ProjectGuid>
+    <RootNamespace>parallelUnifiedDijkstras</RootNamespace>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
@@ -77,7 +77,7 @@
     </CudaCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <CudaCompile Include="sequentialDijkstras.c" />
+    <CudaCompile Include="parallelUnifiedDijkstras.cu" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

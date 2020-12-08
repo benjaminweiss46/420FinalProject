@@ -7,6 +7,10 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "sequentialDijkstras", "sequ
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "parallelDijkstras", "parallelDijkstras\parallelDijkstras.vcxproj", "{40186EFF-5FD3-41B8-8B39-28D95636AC07}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "compareOuputs", "compareOuputs\compareOuputs.vcxproj", "{A362601F-0D5D-4E07-B1E6-D09B60D43FCC}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "parallelUnifiedDijkstras", "parallelUnifiedDijkstras\parallelUnifiedDijkstras.vcxproj", "{4573FEA6-7C56-4A6E-A9E8-30FB0BBCD53B}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -21,6 +25,14 @@ Global
 		{40186EFF-5FD3-41B8-8B39-28D95636AC07}.Debug|x64.Build.0 = Debug|x64
 		{40186EFF-5FD3-41B8-8B39-28D95636AC07}.Release|x64.ActiveCfg = Release|x64
 		{40186EFF-5FD3-41B8-8B39-28D95636AC07}.Release|x64.Build.0 = Release|x64
+		{A362601F-0D5D-4E07-B1E6-D09B60D43FCC}.Debug|x64.ActiveCfg = Debug|x64
+		{A362601F-0D5D-4E07-B1E6-D09B60D43FCC}.Debug|x64.Build.0 = Debug|x64
+		{A362601F-0D5D-4E07-B1E6-D09B60D43FCC}.Release|x64.ActiveCfg = Release|x64
+		{A362601F-0D5D-4E07-B1E6-D09B60D43FCC}.Release|x64.Build.0 = Release|x64
+		{4573FEA6-7C56-4A6E-A9E8-30FB0BBCD53B}.Debug|x64.ActiveCfg = Debug|x64
+		{4573FEA6-7C56-4A6E-A9E8-30FB0BBCD53B}.Debug|x64.Build.0 = Debug|x64
+		{4573FEA6-7C56-4A6E-A9E8-30FB0BBCD53B}.Release|x64.ActiveCfg = Release|x64
+		{4573FEA6-7C56-4A6E-A9E8-30FB0BBCD53B}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
