@@ -34,7 +34,7 @@ __global__ void minDist(int* minInd, bool* included, int* dist) {
 
 int main()
 {
-    printf("Vertices: %d\nSource: %d\n", VERTICES, SOURCE);
+    printf("Vertices: %d\nSource: %d\n# of threads: %d\n# of blocks: %d\n", VERTICES, SOURCE, NUM_OF_THREADS, BLOCKS_THREAD);
 
     //DECLARE VARIABLES 
     cudaError_t cudaStatus = cudaSuccess;
@@ -133,7 +133,7 @@ int main()
     auto end = std::chrono::high_resolution_clock::now();
     auto elapsed = std::chrono::duration_cast<std::chrono::nanoseconds>(end - start).count();
     printf("Timer ends\n");
-    printf("The parallel Dijkstra's SSSP algorithm took %f ms to execute graph with %d vertices using %d threads and %d blocks\n", elapsed / 1000000.0, VERTICES, NUM_OF_THREADS, BLOCKS_THREAD);
+    printf("The parallel explicit Dijkstra's SSSP algorithm took %f ms.\n", elapsed / 1000000.0);
 
     //Copy dist back to host to print
     cudaStatus = cudaMemcpy(dist, d_dist, VERTICES * sizeof(int), cudaMemcpyDeviceToHost);

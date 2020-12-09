@@ -71,7 +71,7 @@ int main()
     printf("Timer ends\n");
     auto end = std::chrono::high_resolution_clock::now();
     auto elapsed = std::chrono::duration_cast<std::chrono::nanoseconds>(end - start).count();
-    printf("The sequential Dijkstra's SSSP algorithm took %f ms to execute graph with %d vertices\n", elapsed / 1000000.0, VERTICES);
+    printf("The sequential Dijkstra's SSSP algorithm took %f ms.\n", elapsed / 1000000.0);
 
     //Print distance of source to every vertex
     /*printf("Source -> Vertex: Distance\n");

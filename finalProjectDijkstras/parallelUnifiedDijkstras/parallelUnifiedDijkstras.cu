@@ -22,7 +22,7 @@ __global__ void parallelDjikstra(int* adj_matrix, int minInd, bool* included, in
 
 int main()
 {
-    printf("Vertices: %d\nSource: %d\n", VERTICES, SOURCE);
+    printf("Vertices: %d\nSource: %d\n# of threads: %d\n# of blocks: %d\n", VERTICES, SOURCE, NUM_OF_THREADS, BLOCKS_THREAD);
 
     //DECLARE VARIABLES 
     cudaError_t cudaStatus = cudaSuccess;
@@ -116,7 +116,7 @@ int main()
     printf("Timer ends\n");
     auto end = std::chrono::high_resolution_clock::now();
     auto elapsed = std::chrono::duration_cast<std::chrono::nanoseconds>(end - start).count();
-    printf("The sequential Dijkstra's SSSP algorithm took %f ms to execute graph with %d vertices\n", elapsed / 1000000.0, VERTICES);
+    printf("The parallel unified Dijkstra's SSSP algorithm took %f ms.\n", elapsed / 1000000.0);
 
     //Print distance of source to every vertex
     /*printf("Source -> Vertex: Distance\n");
